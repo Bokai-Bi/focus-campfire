@@ -4,6 +4,10 @@
   "version": "1.0",
   "permissions": ["storage", "tabs"],
   "manifest_version": 3,
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
   "action": {
     "default_popup": "campfire.html",
     "default_icon": "fire.png"
