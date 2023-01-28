@@ -1,0 +1,10 @@
+{
+  "name": "Focus Campfire",
+  "description": "Extension to help the user focus on their work",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "campfire.html",
+    "default_icon": "fire.png"
+  }
+}
