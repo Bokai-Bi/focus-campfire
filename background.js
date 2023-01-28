@@ -4,6 +4,9 @@ let timer;
 let fireStrength;
 let secondsSinceLastFireIncrease;
 
+let endTime; // the total number of seconds the user has decided to work for (30 minutes to 4 hours)
+
+
 let isDistracted;
 let distractedSeconds; // total seconds the user has been distracted in current session
 
@@ -57,6 +60,9 @@ function countTime(oldSeconds, oldDistractedSeconds){
     }
     currentSeconds = newSeconds;
     distractedSeconds = newDistractedSeconds;
+
+    // increase marshmellow count based on the current number of seconds
+    marshmallowCount = Math.ceil((endTime/72) / (1 + Math.E^((-12/endTime) * (currentSeconds - 0.5 * endTime))));
 
     // increase fire strength every 15 min if strength < 4, else every 30 min
     let fireStrengthIncreaseThresh;
