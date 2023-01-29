@@ -3,6 +3,7 @@ let marshmallowCount;
 let timer;
 let fireStrength;
 let secondsSinceLastFireIncrease;
+let secondsSinceLastFireDecrease;
 
 let endTime = 30; // the total number of minutes the user has decided to work for (30 minutes to 4 hours)
 
@@ -32,13 +33,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         (foundFocus, currentFocus) =>
         (foundFocus || tab.url.includes(currentFocus)), false));
     console.log(isDistracted);
-
-    if (tab.url.includes("thwiki.cc")){
-        console.log("Updating config");
-        updateConfigs();
-        console.log(endTime);
-        console.log(focusUrls);
-    }
 })
 
 // Listener that activates when the tab switches
@@ -76,6 +70,9 @@ chrome.runtime.onMessage.addListener(
         else if (request.content === "stopTimer"){
             stopTimer();
         }
+        else if (request.content === "fireRequest"){
+            sendResponse({firestrength: fireStrength});
+        }
     }
 )
 
@@ -90,10 +87,12 @@ function countTime(oldSeconds, oldDistractedSeconds){
     if (isDistracted){
         newDistractedSeconds = oldDistractedSeconds + 1;
         newSeconds = oldSeconds;
+        secondsSinceLastFireDecrease += 1;
     }
     else{
         newDistractedSeconds = oldDistractedSeconds;
         newSeconds = oldSeconds + 1;
+        secondsSinceLastFireIncrease += 1;
     }
     currentSeconds = newSeconds;
     distractedSeconds = newDistractedSeconds;
@@ -117,12 +116,12 @@ function countTime(oldSeconds, oldDistractedSeconds){
                 updateFireStrength();
             }
     }
-    secondsSinceLastFireIncrease += 1;
 
     // decrease fire strength for every 2 minute spent distracted
-    if ((distractedSeconds%10 == 0) && (distractedSeconds != 0)){
+    if ((secondsSinceLastFireDecrease >= 10)){
         if (fireStrength > 1){
             fireStrength -= 1;
+            secondsSinceLastFireDecrease = 0;
             updateFireStrength();
         }
     }
@@ -136,8 +135,10 @@ function countTime(oldSeconds, oldDistractedSeconds){
 
 function startTimer(){
     // execute countTime with parameter 0 after 1000ms
+    updateConfigs();
     console.log("Timer started from 0");
     secondsSinceLastFireIncrease = 0;
+    secondsSinceLastFireDecrease = 0;
     timer = setTimeout(countTime, 1000, 0, 0);
     updateFireStrength();
 }

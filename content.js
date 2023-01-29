@@ -9,6 +9,8 @@ function changeFireLevel(fireStrength){
     fire.src = currFire;
 }
 
+pullFireStrength();
+
 var currFire = "https://i.imgur.com/Yf4iFR3.png";
 
 
@@ -40,3 +42,13 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
+
+function pullFireStrength(){
+    console.log("Pulling fire strength");
+    (async () => {
+        const response = await chrome.runtime.sendMessage({content: "fireRequest"});
+        // do something with response here, not outside the function
+        changeFireLevel(response.firestrength);
+      })();
+    t = setTimeout(pullFireStrength, 1000);
+}
