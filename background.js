@@ -112,7 +112,7 @@ function countTime(oldSeconds, oldDistractedSeconds){
 
     if (secondsSinceLastFireIncrease >= fireStrengthIncreaseThresh){
             secondsSinceLastFireIncrease = 0;
-            if (fireStrength < 10){
+            if (fireStrength < 9){
                 fireStrength += 1;
                 updateFireStrength();
             }
@@ -126,7 +126,7 @@ function countTime(oldSeconds, oldDistractedSeconds){
             updateFireStrength();
         }
     }
-    if (newSeconds + newDistractedSeconds > endTime){
+    if (newSeconds + newDistractedSeconds > (endTime * 60)){
         // end the fire
     }
     else{

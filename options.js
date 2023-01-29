@@ -18,21 +18,20 @@ function save_options() {
         status.textContent = '';
       }, 750);
     });
-  }
+}
   
-  // Restores select box and checkbox state using the preferences
-  // stored in chrome.storage.
-  function restore_options() {
-    chrome.storage.sync.get({
-      focusTime: '30',
-      focusUrl: "https://example.com",
-      showCampfire: false,
-    }, function(items) {
-      document.getElementById('focusTime').value = items.focusTime;
-      document.getElementById('focusUrl').value = items.focusUrl;
-      document.getElementById('show').checked = items.showCampfire;
-    });
-  }
-  document.addEventListener('DOMContentLoaded', restore_options);
-  document.getElementById('save').addEventListener('click',
-      save_options);
+// Restores select box and checkbox state using the preferences
+// stored in chrome.storage.
+function restore_options() {
+  chrome.storage.sync.get({
+    focusTime: '30',
+    focusUrl: "https://example.com",
+    showCampfire: false,
+  }, function(items) {
+    document.getElementById('focusTime').value = items.focusTime;
+    document.getElementById('focusUrl').value = items.focusUrl;
+    document.getElementById('show').checked = items.showCampfire;
+  });
+}
+document.addEventListener('DOMContentLoaded', restore_options);
+document.getElementById('save').addEventListener('click', save_options);

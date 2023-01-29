@@ -35,10 +35,8 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         console.log("Received");
         if (request.content === "fireUpdate"){
-            alert(request.firestrength);
-        }
-        else if (request.content === "stopTimer"){
-            stopTimer();
+            //alert(request.firestrength);
+            changeFireLevel(request.firestrength);
         }
     }
 )
