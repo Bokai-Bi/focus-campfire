@@ -69,6 +69,7 @@ chrome.runtime.onMessage.addListener(
         if (request.content === "startTimer"){
             startTimer();
             updateConfigs();
+            overlay();
         }
         else if (request.content === "stopTimer"){
             stopTimer();
@@ -128,4 +129,11 @@ function stopTimer(){
 function updateFireStrength(){
     // send updated fireStrength to contentscript
     
+}
+
+
+function overlay(){
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.executeScript(tabs[0].id,{file:"js/overlay.js"});
+      });
 }
