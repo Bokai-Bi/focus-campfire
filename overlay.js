@@ -3,7 +3,10 @@ displayBackground();
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
-    
+    switch (request.content) {
+        
+    }
+
 });
 
 function displayBackground(src) { //Display the background image
