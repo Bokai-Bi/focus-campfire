@@ -99,7 +99,7 @@ function stopTimer(){
 
 function updateFireStrength(){
     // send updated fireStrength to contentscript
-    
+    chrome.runtime.sendMessage(fireStrength);
 }
 
 
