@@ -6,9 +6,7 @@ const imgurlist = ["https://i.imgur.com/Yf4iFR3.png", "https://i.imgur.com/kW4VZ
 function changeFireLevel(fireStrength){
 
     currFire = imgurlist[fireStrength];
-    var new_fire = document.getElementById("focusCampFire_Fire");
-    new_fire.src = currFire;
-
+    fire.src = currFire;
 }
 
 var currFire = "https://i.imgur.com/Yf4iFR3.png";
@@ -26,3 +24,10 @@ fire.width = 100;
 
 var src = document.getElementById("body");
 document.body.append(fire);
+
+
+
+
+
+
+
