@@ -25,3 +25,21 @@ fire.width = 100;
 
 var src = document.getElementById("body");
 document.body.append(fire);
+
+/*window.addEventListener("message", function (event){
+    if (event.data.content === "fireUpdate"){
+        this.alert("New fire strength: " + event.data.firestrength);
+    }
+})*/
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse){
+        console.log("Received");
+        if (request.content === "fireUpdate"){
+            alert(request.firestrength);
+        }
+        else if (request.content === "stopTimer"){
+            stopTimer();
+        }
+    }
+)

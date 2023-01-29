@@ -13,6 +13,7 @@ let distractedSeconds; // total seconds the user has been distracted in current 
 let focusUrls = ["default.com", "youtube.com"];
 
 function updateConfigs(){
+    console.log("updating configs")
     chrome.storage.sync.get({
         focusTime: 0,
         focusUrl: "example.com"
@@ -20,6 +21,7 @@ function updateConfigs(){
         endTime = items.focusTime;
         focusUrls = items.focusUrl.split("|");
     });
+    console.log(endTime + " + " + focusUrls);
 }
 
 // Listener that activates when the tab updates
@@ -69,7 +71,7 @@ chrome.runtime.onMessage.addListener(
             startTimer();
             fireStrength = 1;
             updateConfigs();
-            overlay();
+            //overlay();
         }
         else if (request.content === "stopTimer"){
             stopTimer();
@@ -102,10 +104,10 @@ function countTime(oldSeconds, oldDistractedSeconds){
     // increase fire strength every 15 min if strength < 4, else every 30 min
     let fireStrengthIncreaseThresh;
     if (fireStrength <= 4){
-        fireStrengthIncreaseThresh = 60 * 15;
+        fireStrengthIncreaseThresh = 15;
     }
     else{
-        fireStrengthIncreaseThresh = 60 * 30;
+        fireStrengthIncreaseThresh = 30;
     }
 
     if (secondsSinceLastFireIncrease >= fireStrengthIncreaseThresh){
@@ -118,10 +120,10 @@ function countTime(oldSeconds, oldDistractedSeconds){
     secondsSinceLastFireIncrease += 1;
 
     // decrease fire strength for every 2 minute spent distracted
-    if ((distractedSeconds%120 == 0) && (distractedSeconds != 0)){
+    if ((distractedSeconds%10 == 0) && (distractedSeconds != 0)){
         if (fireStrength > 1){
             fireStrength -= 1;
-            updateFireStrength;
+            updateFireStrength();
         }
     }
     if (newSeconds + newDistractedSeconds > endTime){
@@ -137,6 +139,7 @@ function startTimer(){
     console.log("Timer started from 0");
     secondsSinceLastFireIncrease = 0;
     timer = setTimeout(countTime, 1000, 0, 0);
+    updateFireStrength();
 }
 
 function stopTimer(){
@@ -146,12 +149,23 @@ function stopTimer(){
 
 function updateFireStrength(){
     // send updated fireStrength to contentscript
-    chrome.runtime.sendMessage({content: "fireUpdate", value: fireStrength});
+    console.log("sending updated fire strength with window: " + fireStrength);
+    //window.postMessage({content: "fireUpdate", firestrength: fireStrength});
+    //chrome.runtime.sendMessage({content: "fireUpdate", value: fireStrength});
+    /*chrome.tabs.query({active: true, currentWindow: true}, function (tabs){
+        chrome.tabs.sendMessage(tabs[0].id, {content: "fireUpdate", firestrength: fireStrength});
+    })*/
+    (async () => {
+        const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
+        const response = await chrome.tabs.sendMessage(tab.id, {content: "fireUpdate", firestrength: fireStrength});
+        // do something with response here, not outside the function
+      })();
 }
 
 
-function overlay(){
+/*function overlay(){
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.executeScript(tabs[0].id,{file:"js/overlay.js"});
       });
-}
+}*/
+
