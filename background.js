@@ -61,6 +61,7 @@ chrome.runtime.onInstalled.addListener(() => {
 // Listener that activates on receiving a message (from content script probably)
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
+        console.log("Content: " + request.content);
         if (request.content === "startTimer"){
             startTimer();
             fireStrength = 1;
@@ -72,6 +73,10 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.content === "fireRequest"){
             sendResponse({firestrength: fireStrength});
+        }
+        else if (request.content === "timeRequest"){
+            console.log(currentSeconds + " " + distractedSeconds);
+            sendResponse({currSec: currentSeconds, distSec: distractedSeconds});
         }
     }
 )
