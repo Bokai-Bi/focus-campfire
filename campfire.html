@@ -7,5 +7,31 @@
     <h1>Campfire :)</h1>
     <img src = "img/d950657635f80c5.gif" width = 100px>
     <script src="popup.js"></script>
-  </body>
+  
+<br>
+
+Target Focus Time (minutes):
+<input id="focusTime" type="number" value="30" max="240" min="30"/>
+
+<br>
+
+Focus Websites:
+<input type="url" name="url" id="focusUrl"
+    placeholder="https://example.com"
+    size="30"
+    required>
+
+<br>
+
+<label>
+    <input type="checkbox" id="show">
+    Show campfire.
+</label>
+
+<div id="status"></div>
+<button id="save">Save</button>
+
+
+<script src="options.js"></script>
+</body>
 </html>

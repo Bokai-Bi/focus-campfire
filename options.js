@@ -2,9 +2,11 @@
 function save_options() {
     var time = document.getElementById('focusTime').value;
     var url = document.getElementById('focusUrl').value;
+    var show = document.getElementById('show').checked;
     chrome.storage.sync.set({
       focusTime: time,
       focusUrl: url,
+      showCampfire: show
     }, function() {
       // Update status to let user know options were saved.
       var status = document.getElementById('status');
@@ -21,9 +23,11 @@ function save_options() {
     chrome.storage.sync.get({
       focusTime: '30',
       focusUrl: "https://example.com",
+      showCampfire: false,
     }, function(items) {
       document.getElementById('focusTime').value = items.focusTime;
       document.getElementById('focusUrl').value = items.focusUrl;
+      document.getElementById('show').checked = items.showCampfire;
     });
   }
   document.addEventListener('DOMContentLoaded', restore_options);
