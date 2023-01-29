@@ -10,19 +10,47 @@ let endTime; // the total number of seconds the user has decided to work for (30
 let isDistracted;
 let distractedSeconds; // total seconds the user has been distracted in current session
 
-// Listener that activates when the tab switches
-chrome.tabs.onUpdated.addListener((tabId, tab) => {
+let maxFocusTime = 6000;
+let focusUrls = ["default.com", "youtube.com"];
+
+function updateConfigs(){
+    chrome.storage.sync.get({
+        focusTime: 0,
+        focusUrl: "example.com"
+    }, function(items){
+        maxFocusTime = items.focusTime;
+        focusUrls = items.focusUrl.split("|");
+    });
+}
+
+// Listener that activates when the tab updates
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // Check if the current page is a focus webpage, set isDistracted accordingly
-    if (
-        // condition check tab.url
-    ){
-        // is distracted
-        isDistracted = true;
+    // console.log(tab.url);
+    isDistracted = !(focusUrls.reduce(
+        (foundFocus, currentFocus) =>
+        (foundFocus || tab.url.includes(currentFocus)), false));
+    console.log(isDistracted);
+
+    if (tab.url.includes("thwiki.cc")){
+        console.log("Updating config");
+        updateConfigs();
+        console.log(maxFocusTime);
+        console.log(focusUrls);
     }
-    else{
-        // is not distracted
-        isDistracted = false;
-    }
+})
+
+// Listener that activates when the tab switches
+chrome.tabs.onActivated.addListener((changeInfo) => {
+    // Check if the current page is a focus webpage, set isDistracted accordingly
+    chrome.tabs.query({currentWindow: true, active: true}, function(newTabs){
+        const newUrl = newTabs[0].url;
+        // console.log(newUrl);
+        isDistracted = !(focusUrls.reduce(
+            (foundFocus, currentFocus) =>
+            (foundFocus || newUrl.includes(currentFocus)), false)); 
+        console.log(isDistracted);
+    })
 })
 
 // Listener that activates on installing the extension
@@ -40,6 +68,7 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         if (request.content === "startTimer"){
             startTimer();
+            updateConfigs();
             overlay();
         }
         else if (request.content === "stopTimer"){
