@@ -4,13 +4,12 @@ let timer;
 let fireStrength;
 let secondsSinceLastFireIncrease;
 
-let endTime; // the total number of seconds the user has decided to work for (30 minutes to 4 hours)
+let endTime = 30; // the total number of minutes the user has decided to work for (30 minutes to 4 hours)
 
 
 let isDistracted;
 let distractedSeconds; // total seconds the user has been distracted in current session
 
-let maxFocusTime = 6000;
 let focusUrls = ["default.com", "youtube.com"];
 
 function updateConfigs(){
@@ -18,7 +17,7 @@ function updateConfigs(){
         focusTime: 0,
         focusUrl: "example.com"
     }, function(items){
-        maxFocusTime = items.focusTime;
+        endTime = items.focusTime;
         focusUrls = items.focusUrl.split("|");
     });
 }
@@ -35,7 +34,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (tab.url.includes("thwiki.cc")){
         console.log("Updating config");
         updateConfigs();
-        console.log(maxFocusTime);
+        console.log(endTime);
         console.log(focusUrls);
     }
 })
@@ -68,6 +67,7 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         if (request.content === "startTimer"){
             startTimer();
+            fireStrength = 1;
             updateConfigs();
             overlay();
         }
@@ -78,6 +78,11 @@ chrome.runtime.onMessage.addListener(
 )
 
 function countTime(oldSeconds, oldDistractedSeconds){
+
+    console.log("seconds: " + oldSeconds);
+    console.log("distracted seconds: " + oldDistractedSeconds);
+    console.log("fire strength: " + fireStrength);
+
     let newSeconds;
     let newDistractedSeconds;
     if (isDistracted){
@@ -103,22 +108,35 @@ function countTime(oldSeconds, oldDistractedSeconds){
         fireStrengthIncreaseThresh = 60 * 30;
     }
 
-    if (secondsSinceLastFireIncrease > fireStrengthIncreaseThresh){
+    if (secondsSinceLastFireIncrease >= fireStrengthIncreaseThresh){
             secondsSinceLastFireIncrease = 0;
-            fireStrength += 1;
-            updateFireStrength();
+            if (fireStrength < 10){
+                fireStrength += 1;
+                updateFireStrength();
+            }
+    }
+    secondsSinceLastFireIncrease += 1;
+
+    // decrease fire strength for every 2 minute spent distracted
+    if ((distractedSeconds%120 == 0) && (distractedSeconds != 0)){
+        if (fireStrength > 1){
+            fireStrength -= 1;
+            updateFireStrength;
+        }
+    }
+    if (newSeconds + newDistractedSeconds > endTime){
+        // end the fire
     }
     else{
-        secondsSinceLastFireIncrease += 1;
+        timer = setTimeout(countTime, 1000, newSeconds, newDistractedSeconds);
     }
-
-    timer = setTimeOut(countTime, 1000, newSeconds);
 }
 
 function startTimer(){
     // execute countTime with parameter 0 after 1000ms
+    console.log("Timer started from 0");
     secondsSinceLastFireIncrease = 0;
-    timer = setTimeOut(countTime, 1000, 0);
+    timer = setTimeout(countTime, 1000, 0, 0);
 }
 
 function stopTimer(){
@@ -128,7 +146,7 @@ function stopTimer(){
 
 function updateFireStrength(){
     // send updated fireStrength to contentscript
-    chrome.runtime.sendMessage(fireStrength);
+    chrome.runtime.sendMessage({content: "fireUpdate", value: fireStrength});
 }
 
 

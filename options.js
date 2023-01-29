@@ -3,6 +3,9 @@ function save_options() {
     var time = document.getElementById('focusTime').value;
     var url = document.getElementById('focusUrl').value;
     var show = document.getElementById('show').checked;
+
+    chrome.runtime.sendMessage({content:"startTimer"});
+
     chrome.storage.sync.set({
       focusTime: time,
       focusUrl: url,
